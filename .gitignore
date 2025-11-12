@@ -1,3 +1,88 @@
+# ==========================================
+# 🧵 KnittingNote iOS App - .gitignore
+# ==========================================
+
+# Xcode build files
+DerivedData/
+build/
+
+# User-specific Xcode settings
+*.xcuserdata/
+*.xcuserstate
+*.xcuserdatad
+*.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+*.xccheckout
+*.moved-aside
+*.xcscmblueprint
+
+# macOS system files
+.DS_Store
+
+# Swift Package Manager
+/.build/
+/Packages/
+Artifacts/
+
+# CocoaPods
+Pods/
+
+# Carthage
+Carthage/Build/
+
+# ==========================================
+# 🧩 앱 데이터 & 개인 기록 관련 제외 항목
+# ==========================================
+
+# User data (Core Data or local storage)
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.coredata
+*.db
+
+# Thumbnails, cache, temp images
+*.jpg
+*.jpeg
+*.png
+*.heic
+*.gif
+*.tmp
+*.cache/
+Cache/
+Caches/
+tmp/
+
+# Exported project backups
+Backups/
+Export/
+Exports/
+
+# ==========================================
+# 🧰 기타 개발 환경 관련
+# ==========================================
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output/
+
+# SwiftPM binaries
+.swiftpm/xcode/
+.swiftpm/DerivedData/
+.swiftpm/Packages/
+
+# Xcode Cloud
+.xcresult/
+.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+
+# Log files
+*.log
+*.xcactivitylog
+
+# ==========================================
+# ✅ End of .gitignore
+# ==========================================
 # Xcode
 DerivedData/
 build/
