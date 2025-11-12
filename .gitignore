@@ -1,0 +1,25 @@
+# Xcode
+DerivedData/
+build/
+*.xcuserdata/
+*.xcuserstate
+*.xcuserdatad
+*.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+.DS_Store
+
+# Swift Package Manager
+/.build/
+/Packages/
+
+# CocoaPods
+Pods/
+
+# SwiftPM binary artifacts
+Artifacts/
+
+# User-specific Xcode files
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+*.xcscmblueprint
+
