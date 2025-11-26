@@ -15,7 +15,7 @@ struct KnitProject: Identifiable, Codable {
     var needle: String
     var currentRow: Int = 0
     var notes: String = ""
-    var photoData: Data? = nil // optional image
+    var photoData: Data? = nil
 }
 
 extension KnitProject {

@@ -10,6 +10,10 @@ import SwiftUI
 struct ProjectDetailView: View {
     @EnvironmentObject var store: ProjectStore
     @State var project: KnitProject
+    @State private var showDeleteAlert = false
+    @State private var showImagePicker = false
+    @State private var selectedImage: UIImage? = nil
+    
     
     var body: some View {
         ScrollView {
@@ -22,7 +26,31 @@ struct ProjectDetailView: View {
                         .clipped()
                         .cornerRadius(20)
                         .shadow(radius: 5)
+                    Button("사진 삭제",role: .destructive) {
+                          project.photoData = nil
+                          store.save()
+                          showDeleteAlert = true
+                    }
+                      .padding()
+                    
                 }
+                else{
+                    Button("사진 추가") {
+                          showImagePicker = true
+                      }
+                    .sheet(isPresented: $showImagePicker) {
+                        ImagePicker(image: $selectedImage)
+                    }
+                    .onChange(of: selectedImage) { newImage in
+                           if let img = newImage,
+                              let data = img.jpegData(compressionQuality: 0.8) {
+                               var updated = project
+                               updated.photoData = data
+                               store.update(updated)
+                           }
+                       }
+                }
+                
                 
                 VStack(alignment: .leading, spacing: 12) {
                     Text(project.title)
@@ -76,7 +104,16 @@ struct ProjectDetailView: View {
         }
         .background(Color(.systemGroupedBackground))
         .navigationBarTitleDisplayMode(.inline)
+        //실제 삭제 실행
+        .alert("사진을 삭제할까요?", isPresented: $showDeleteAlert) {
+                    Button("삭제", role: .destructive) {
+                        project.photoData = nil
+                        store.update(project)   // 저장
+                    }
+                    Button("취소", role: .cancel) {}
+                }
     }
+    
     
     private func saveChange() {
         store.update(project)
