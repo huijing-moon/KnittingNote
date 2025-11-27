@@ -8,6 +8,18 @@
 import Foundation
 import SwiftUI
 
+enum ProjectStatus: String, Codable, CaseIterable {
+    case inProgress = "작업 중"
+    case completed = "완성"
+    case wishlist = "위시리스트"
+    
+    
+    var displayName: String {
+        self.rawValue
+    }
+}
+
+
 struct KnitProject: Identifiable, Codable {
     var id = UUID()
     var title: String
@@ -16,6 +28,7 @@ struct KnitProject: Identifiable, Codable {
     var currentRow: Int = 0
     var notes: String = ""
     var photoData: Data? = nil
+    var status: ProjectStatus = .inProgress
 }
 
 extension KnitProject {

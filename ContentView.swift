@@ -7,15 +7,28 @@
 
 import SwiftUI
 
+
 struct ContentView: View {
+  
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView {
+            ProjectListView(status: .inProgress)
+                .tabItem {
+                    Label("작업 중", systemImage: "hammer")
+                }
+
+            ProjectListView(status: .completed)
+                .tabItem {
+                    Label("완성", systemImage: "checkmark.circle")
+                }
+
+            ProjectListView(status: .wishlist)
+                .tabItem {
+                    Label("위시리스트", systemImage: "star")
+                }
         }
-        .padding()
+       
     }
 }
 

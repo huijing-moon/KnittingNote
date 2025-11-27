@@ -27,9 +27,9 @@ struct ProjectDetailView: View {
                         .cornerRadius(20)
                         .shadow(radius: 5)
                     Button("사진 삭제",role: .destructive) {
+                          showDeleteAlert = true
                           project.photoData = nil
                           store.save()
-                          showDeleteAlert = true
                     }
                       .padding()
                     
@@ -55,6 +55,16 @@ struct ProjectDetailView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text(project.title)
                         .font(.largeTitle.bold())
+                    //  StatusPicker 추가
+                            Picker("상태", selection: $project.status) {
+                                ForEach(ProjectStatus.allCases, id: \.self) { status in
+                                    Text(status.displayName).tag(status)
+                                }
+                            }
+                            .pickerStyle(.segmented)  // 예쁜 세그먼트 스타일
+                            
+                            Divider()
+
                     HStack {
                         Label(project.yarn, systemImage: "scissors")
                         Label(project.needle, systemImage: "paintbrush.pointed")

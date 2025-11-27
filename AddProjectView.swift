@@ -17,6 +17,7 @@ struct AddProjectView: View {
     @State private var needle = ""
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var photoData: Data?
+    @State private var project = KnitProject(title: "", yarn: "", needle: "")
     
     var body: some View {
         NavigationStack {
@@ -47,7 +48,8 @@ struct AddProjectView: View {
                                     }
                                 )
                         }
-                        
+               
+
                         PhotosPicker(selection: $selectedPhoto, matching: .images) {
                             Label("사진 추가", systemImage: "plus.circle.fill")
                                 .font(.callout)
@@ -60,6 +62,13 @@ struct AddProjectView: View {
                         InputField(title: "프로젝트 이름", text: $title, icon: "text.book.closed")
                         InputField(title: "실 종류", text: $yarn, icon: "scissors")
                         InputField(title: "바늘", text: $needle, icon: "paintbrush.pointed")
+                        // ⭐⭐ 여기! 이 부분에 Picker 추가 ⭐⭐
+                        Picker("프로젝트 상태", selection: $project.status) {
+                            ForEach(ProjectStatus.allCases, id: \.self) { status in
+                                Text(status.rawValue).tag(status)
+                            }
+                        }
+                        .pickerStyle(.segmented)
                     }
                     .padding(.horizontal)
                     

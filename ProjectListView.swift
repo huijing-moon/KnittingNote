@@ -10,22 +10,26 @@ import SwiftUI
 struct ProjectListView: View {
     @EnvironmentObject var store: ProjectStore
     @State private var showingAdd = false
-    
+    let status: ProjectStatus
+
+    var filteredProjects: [KnitProject] {
+        store.projects.filter { $0.status == status }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
-                ScrollView {
-                    LazyVStack(spacing: 16) {
-                        ForEach(store.projects) { project in
-                            NavigationLink(destination: ProjectDetailView(project: project)) {
-                                ProjectCardView(project: project)
-                            }
-                            .buttonStyle(.plain)
+
+                List {
+                    ForEach(filteredProjects) { project in
+                        NavigationLink(destination: ProjectDetailView(project: project)) {
+                            Text(project.title)
                         }
                     }
-                    .padding()
                 }
-                
+                .listStyle(.plain)
+                .navigationTitle(status.rawValue)
+
                 // ➕ 플로팅 버튼
                 Button {
                     showingAdd = true
@@ -40,15 +44,24 @@ struct ProjectListView: View {
                 }
                 .padding()
             }
-            .navigationTitle("🧶 KnitNote")
             .sheet(isPresented: $showingAdd) {
                 AddProjectView()
             }
-            .background(Color(.systemGroupedBackground))
         }
     }
 }
 
+// ⭐ 섹션 헤더 UI
+@ViewBuilder
+func sectionHeader(_ title: String) -> some View {
+    HStack {
+        Text(title)
+            .font(.title3.bold())
+            .foregroundColor(.primary)
+        Spacer()
+    }
+    .padding(.horizontal, 4)
+}
 struct ProjectCardView: View {
     let project: KnitProject
     
@@ -71,18 +84,17 @@ struct ProjectCardView: View {
             Text(project.title)
                 .font(.headline)
             
-            
             HStack {
-                            Label("\(project.currentRow)단", systemImage: "number.circle")
-                            Spacer()
-                            Label(project.yarn, systemImage: "scissors")
-                        }
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    }
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(20)
-                    .shadow(color: .black.opacity(0.08), radius: 5, x: 0, y: 3)
-                }
+                Label("\(project.currentRow)단", systemImage: "number.circle")
+                Spacer()
+                Label(project.yarn, systemImage: "scissors")
             }
+            .font(.subheadline)
+            .foregroundColor(.secondary)
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(20)
+        .shadow(color: .black.opacity(0.08), radius: 5, x: 0, y: 3)
+    }
+}

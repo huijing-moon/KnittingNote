@@ -13,7 +13,7 @@ struct KnitNoteApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ProjectListView()
+            ContentView()
                 .environmentObject(store)
         }
     }
