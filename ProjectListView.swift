@@ -22,13 +22,17 @@ struct ProjectListView: View {
 
                 List {
                     ForEach(filteredProjects) { project in
-                        NavigationLink(destination: ProjectDetailView(project: project)) {
-                            Text(project.title)
+                        NavigationLink {
+                            ProjectDetailView(project: project)
+                        } label: {
+                            ProjectCardView(project: project)
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
                         }
                     }
                 }
                 .listStyle(.plain)
-                .navigationTitle(status.rawValue)
+
 
                 // ➕ 플로팅 버튼
                 Button {
@@ -67,6 +71,7 @@ struct ProjectCardView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
+            
             if let image = project.image {
                 image
                     .resizable()
@@ -81,20 +86,26 @@ struct ProjectCardView: View {
                     .overlay(Text("📸 사진 없음").foregroundColor(.gray))
             }
             
-            Text(project.title)
-                .font(.headline)
+
             
-            HStack {
-                Label("\(project.currentRow)단", systemImage: "number.circle")
-                Spacer()
-                Label(project.yarn, systemImage: "scissors")
-            }
-            .font(.subheadline)
-            .foregroundColor(.secondary)
-        }
+                        HStack {
+                            if !project.rowCounters.isEmpty {
+                                Text(project.rowSummaryText)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+            
+                            Spacer()
+                            Label(project.yarn, systemImage: "scissors")
+                        }
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    }
         .padding()
         .background(Color.white)
         .cornerRadius(20)
         .shadow(color: .black.opacity(0.08), radius: 5, x: 0, y: 3)
-    }
+        
+        }
+
 }
