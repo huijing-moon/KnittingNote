@@ -8,7 +8,11 @@
 import Foundation
 @MainActor
 class ProjectStore: ObservableObject{
-    @Published var projects: [KnitProject] = []
+    @Published var projects: [KnitProject] = [] {
+            didSet {
+                save()
+            }
+        }
         private let savePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("projects.json")
         
@@ -23,11 +27,24 @@ class ProjectStore: ObservableObject{
             }
         }
         
-        func save() {
-            if let data = try? JSONEncoder().encode(projects) {
-                try? data.write(to: savePath)
+    func save() {
+        // 1. 현재 데이터를 '값'으로 복사 (메인 스레드 점유 최소화)
+        let projectsCopy = self.projects
+        let path = self.savePath
+
+        // 2. Task에서 'detached'를 사용해 메인 액터와 완전히 격리시킵니다.
+        Task.detached(priority: .background) {
+            do {
+                // 3. 사진이 든 무거운 데이터를 JSON으로 바꾸는 고된 작업 (백그라운드)
+                let data = try JSONEncoder().encode(projectsCopy)
+                // 4. 파일 쓰기
+                try data.write(to: path)
+                print("✅ 백그라운드 저장 성공")
+            } catch {
+                print("❌ 저장 오류: \(error)")
             }
         }
+    }
         
         func add(_ project: KnitProject) {
             projects.append(project)
@@ -45,4 +62,6 @@ class ProjectStore: ObservableObject{
             projects.remove(atOffsets: indexSet)
             save()
         }
+    
+    
 }

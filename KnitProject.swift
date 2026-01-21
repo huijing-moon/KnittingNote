@@ -10,7 +10,7 @@ import SwiftUI
 import UIKit
 
 
-enum ProjectStatus: String, Codable, CaseIterable {
+enum ProjectStatus: String, Codable, CaseIterable, Hashable {
     case inProgress = "작업 중"
     case completed = "완성"
     case wishlist = "위시리스트"

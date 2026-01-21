@@ -9,15 +9,45 @@ import SwiftUI
 
 struct ProjectDetailView: View {
     @EnvironmentObject var store: ProjectStore
-    @State var project: KnitProject
+    @Binding var project: KnitProject
+    // 1. UI용 로컬 상태를 하나 만듭니다. (초기값은 프로젝트의 현재 상태)
+    @State private var selectedStatus: ProjectStatus = .inProgress
     @State private var showDeleteAlert = false
     @State private var showImagePicker = false
     @State private var selectedImage: UIImage? = nil
+
+ 
     
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                
+            
+                // MARK: - 제목 + 상태 + 정보
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(project.title)
+                        .font(.largeTitle.bold())
+                    Picker("상태", selection: $selectedStatus) {
+                                            ForEach(ProjectStatus.allCases, id: \.self) { status in
+                                                Text(status.displayName).tag(status)
+                                            }
+                                        }
+                                        .pickerStyle(.segmented)
+                                        // ✅ 추가: 값이 바뀔 때 UI만 먼저 반응하게 강제합니다.
+                                        .onChange(of: selectedStatus) { _ in
+                                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                        }
+                    .pickerStyle(.segmented)
+                    Divider()
+                 
+                    
+                    HStack {
+                        Label(project.yarn, systemImage: "scissors")
+                        Label(project.needle, systemImage: "paintbrush.pointed" )
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+                    
+                }
                 // MARK: - 사진 영역
                 if let image = project.image {
                     image
@@ -41,15 +71,15 @@ struct ProjectDetailView: View {
                         ImagePicker(image: $selectedImage)
                     }
                     .onChange(of: selectedImage) { newImage in
-                        if let img = newImage,
-                           let data = img.jpegData(compressionQuality: 0.8) {
-                            var updated = project
-                            updated.photoData = data
-                            store.update(updated)
+                        if let img = newImage {
+                            // 압축률을 0.1(최대 압축)로 설정해보세요.
+                            // 0.1이어도 폰 화면에서 보기엔 충분합니다.
+                            if let data = img.jpegData(compressionQuality: 0.1) {
+                                project.photoData = data
+                            }
                         }
                     }
                 }
-                
                 
                 Text("단수 체크")
                     .font(.headline)
@@ -97,6 +127,7 @@ struct ProjectDetailView: View {
                         
                     }
                     .padding(.vertical, 4)
+           
                 }
 
                 
@@ -106,18 +137,34 @@ struct ProjectDetailView: View {
                     .padding(8)
                     .background(Color(.systemGray6))
                     .cornerRadius(12)
-                    .onChange(of: project.notes) { _ in saveChange() }
-                
+                  //  .onChange(of: project.notes) { _ in saveChange() }
+               
             }
             .padding()
             .background(Color.white)
             .cornerRadius(20)
             .shadow(color: .black.opacity(0.05), radius: 4)
             .padding(.horizontal)
+      
         }
+        
         .background(Color(.systemGroupedBackground))
         .navigationBarTitleDisplayMode(.inline)
         .padding(.bottom)
+        .onAppear {
+                    // 3. 페이지가 열릴 때 딱 한 번만 데이터를 복사해옵니다.
+                    if selectedStatus != project.status {
+                        selectedStatus = project.status
+                    }
+                }
+                .onDisappear {
+                    // 4. 페이지를 완전히 나갈 때만 원본에 '딱 한 번' 저장합니다.
+                    // 이렇게 하면 Picker를 누를 때 부모 리스트가 갱신되지 않습니다.
+                    if project.status != selectedStatus {
+                        project.status = selectedStatus
+                        store.update(project) // 직접 store를 호출하여 확실히 저장
+                    }
+                }
         .alert("사진을 삭제할까요?", isPresented: $showDeleteAlert) {
             Button("삭제", role: .destructive) {
                 project.photoData = nil
