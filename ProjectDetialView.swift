@@ -10,33 +10,53 @@ import SwiftUI
 struct ProjectDetailView: View {
     @EnvironmentObject var store: ProjectStore
     @Binding var project: KnitProject
-    // 1. UI용 로컬 상태를 하나 만듭니다. (초기값은 프로젝트의 현재 상태)
-    @State private var selectedStatus: ProjectStatus = .inProgress
+  
     @State private var showDeleteAlert = false
     @State private var showImagePicker = false
     @State private var selectedImage: UIImage? = nil
-
- 
+    @Binding var selectedTab: Int
+   @State private var selectedStatus: ProjectStatus
+    
+    
+    init(project: Binding<KnitProject>, selectedTab: Binding<Int>) {
+        self._project = project
+        self._selectedTab = selectedTab
+        self._selectedStatus = State(initialValue: project.wrappedValue.status)
+    }
+    
     
     var body: some View {
+//        VStack {
+//            // 🔥 상태 영역 (고정)
+//            Picker("상태", selection: $project.status) {
+//                ForEach(ProjectStatus.allCases, id: \.self) {
+//                    Text($0.displayName).tag($0)
+//                }
+//            }
+//            .pickerStyle(.segmented)
+//        
+        
         ScrollView {
+            
+            
             VStack(spacing: 20) {
             
                 // MARK: - 제목 + 상태 + 정보
                 VStack(alignment: .leading, spacing: 12) {
                     Text(project.title)
                         .font(.largeTitle.bold())
-                    Picker("상태", selection: $selectedStatus) {
-                                            ForEach(ProjectStatus.allCases, id: \.self) { status in
-                                                Text(status.displayName).tag(status)
-                                            }
-                                        }
-                                        .pickerStyle(.segmented)
-                                        // ✅ 추가: 값이 바뀔 때 UI만 먼저 반응하게 강제합니다.
-                                        .onChange(of: selectedStatus) { _ in
-                                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                        }
+                    Picker("상태", selection: $project.status) {
+                        ForEach(ProjectStatus.allCases, id: \.self) {
+                            Text($0.displayName).tag($0)
+                        }
+                    }
                     .pickerStyle(.segmented)
+                    .onChange(of: project.status) { _ in
+                        selectedTab = 0
+                    }
+                    .pickerStyle(.segmented)
+              
+                    
                     Divider()
                  
                     
@@ -57,7 +77,8 @@ struct ProjectDetailView: View {
                         .clipped()
                         .cornerRadius(20)
                         .shadow(radius: 5)
-                    
+                        .allowsHitTesting(false)   // ⭐️ 핵심
+                        .allowsHitTesting(false)   // ⭐️ 핵심
                     Button("사진 삭제", role: .destructive) {
                         showDeleteAlert = true
                     }
@@ -164,6 +185,8 @@ struct ProjectDetailView: View {
                         project.status = selectedStatus
                         store.update(project) // 직접 store를 호출하여 확실히 저장
                     }
+                    selectedTab = 0
+                    store.save()
                 }
         .alert("사진을 삭제할까요?", isPresented: $showDeleteAlert) {
             Button("삭제", role: .destructive) {
@@ -172,6 +195,7 @@ struct ProjectDetailView: View {
             }
             Button("취소", role: .cancel) {}
         }
+ 
     }
     
     private func saveChange() {

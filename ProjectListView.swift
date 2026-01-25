@@ -10,12 +10,27 @@ import SwiftUI
 struct ProjectListView: View {
     @EnvironmentObject var store: ProjectStore
     @State private var showingAdd = false
-    let status: ProjectStatus
+    let status: ProjectStatus?
+    @Binding var selectedTab: Int
+    
+    var projectsToShow: [Binding<KnitProject>] {
+         let indices = store.projects.indices
 
-    var filteredProjects: [Binding<KnitProject>] {
-          $store.projects.filter { $0.wrappedValue.status == status }
-      }
-
+         if let status {
+             return indices
+                 .filter { store.projects[$0].status == status }
+                 .map { $store.projects[$0] }
+         } else {
+             return indices.map { $store.projects[$0] }
+         }
+     }
+    
+    var filteredProjectIndices: [Int] {
+        store.projects.indices.filter {
+            store.projects[$0].status == status
+        }
+    }
+    
     var body: some View {
       
             ZStack(alignment: .bottomTrailing) {
@@ -23,20 +38,21 @@ struct ProjectListView: View {
                 // ProjectListView.swift
 
                 List {
-                    ForEach($store.projects) { $project in
-                        // ❌ if project.status == status { ... } 방식은 데이터가 크면 UI를 깨뜨립니다.
-                        
-                        // ✅ 대신 contentShape 등을 활용하거나
-                        // 상태가 맞는 경우만 뷰를 보여주되, 구조적 연결은 유지합니다.
-                        if project.status == status {
-                            NavigationLink(destination: ProjectDetailView(project: $project)) {
-                                ProjectCardView(project: project)
-                            }
+                    ForEach(projectsToShow) { $project in
+                        NavigationLink {
+                            ProjectDetailView(
+                                project: $project,
+                                selectedTab: $selectedTab
+                            )
+                        } label: {
+                            ProjectCardView(project: project)
                         }
+
+                        
                     }
+
                 }
                 .listStyle(.plain)
-             
                 
                 // ➕ 플로팅 버튼
                 Button {
