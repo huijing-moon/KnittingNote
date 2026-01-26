@@ -58,10 +58,9 @@ class ProjectStore: ObservableObject{
             }
         }
         
-        func delete(_ indexSet: IndexSet) {
-            projects.remove(atOffsets: indexSet)
-            save()
-        }
-    
+    func delete(_ project: KnitProject) {
+        projects.removeAll { $0.id == project.id }
+        save()
+    }
     
 }

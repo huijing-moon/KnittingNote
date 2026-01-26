@@ -15,27 +15,18 @@ struct ProjectDetailView: View {
     @State private var showImagePicker = false
     @State private var selectedImage: UIImage? = nil
     @Binding var selectedTab: Int
-   @State private var selectedStatus: ProjectStatus
+ 
     
     
     init(project: Binding<KnitProject>, selectedTab: Binding<Int>) {
         self._project = project
         self._selectedTab = selectedTab
-        self._selectedStatus = State(initialValue: project.wrappedValue.status)
     }
     
     
     var body: some View {
-//        VStack {
-//            // 🔥 상태 영역 (고정)
-//            Picker("상태", selection: $project.status) {
-//                ForEach(ProjectStatus.allCases, id: \.self) {
-//                    Text($0.displayName).tag($0)
-//                }
-//            }
-//            .pickerStyle(.segmented)
-//        
-        
+
+ 
         ScrollView {
             
             
@@ -51,11 +42,10 @@ struct ProjectDetailView: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                    .onChange(of: project.status) { _ in
+                    .onChange(of: project.status) { newValue in
+                        saveChange()  // ⭐️ 변경 시 즉시 저장
                         selectedTab = 0
                     }
-                    .pickerStyle(.segmented)
-              
                     
                     Divider()
                  
@@ -172,22 +162,10 @@ struct ProjectDetailView: View {
         .background(Color(.systemGroupedBackground))
         .navigationBarTitleDisplayMode(.inline)
         .padding(.bottom)
-        .onAppear {
-                    // 3. 페이지가 열릴 때 딱 한 번만 데이터를 복사해옵니다.
-                    if selectedStatus != project.status {
-                        selectedStatus = project.status
-                    }
-                }
-                .onDisappear {
-                    // 4. 페이지를 완전히 나갈 때만 원본에 '딱 한 번' 저장합니다.
-                    // 이렇게 하면 Picker를 누를 때 부모 리스트가 갱신되지 않습니다.
-                    if project.status != selectedStatus {
-                        project.status = selectedStatus
-                        store.update(project) // 직접 store를 호출하여 확실히 저장
-                    }
-                    selectedTab = 0
-                    store.save()
-                }
+        .onDisappear {
+            selectedTab = 0
+            store.save()  // 최종 저장만 수행
+        }
         .alert("사진을 삭제할까요?", isPresented: $showDeleteAlert) {
             Button("삭제", role: .destructive) {
                 project.photoData = nil
