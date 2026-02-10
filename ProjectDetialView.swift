@@ -51,8 +51,20 @@ struct ProjectDetailView: View {
                  
                     
                     HStack {
-                        Label(project.yarn, systemImage: "scissors")
-                        Label(project.needle, systemImage: "paintbrush.pointed" )
+                        HStack(spacing: 4) {
+                            Image(systemName: "scissors")
+                                .foregroundColor(.accentColor)
+                            TextField("실 이름", text: $project.yarn)
+                                .textFieldStyle(.roundedBorder)
+                                .onSubmit { saveChange() }
+                        }
+                        HStack(spacing: 4) {
+                            Image(systemName: "paintbrush.pointed")
+                                .foregroundColor(.accentColor)
+                            TextField("바늘 이름", text: $project.needle)
+                                .textFieldStyle(.roundedBorder)
+                                .onSubmit { saveChange() }
+                        }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)

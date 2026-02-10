@@ -35,6 +35,8 @@ struct KnitProject: Identifiable, Codable {
     // 추가
     var rowTitle: String = "현재 단수"
     
+    //즐겨찾기 기능
+    var isFavorite: Bool = false
     
     // 🔥 단수 카운터 여러 개
      var rowCounters: [RowCounter] = [

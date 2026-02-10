@@ -63,4 +63,12 @@ class ProjectStore: ObservableObject{
         save()
     }
     
+    func toggleFavorite(_ project : KnitProject){
+        if let index = projects.firstIndex(where: {$0.id == project.id}){
+            projects[index].isFavorite.toggle()
+            save()
+        }
+        
+    }
+    
 }

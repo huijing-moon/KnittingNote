@@ -10,3 +10,4 @@ struct CompletedProjectView: View {
         Text("완성된 프로젝트")
     }
 }
+

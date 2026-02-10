@@ -14,16 +14,26 @@ struct ProjectListView: View {
     @Binding var selectedTab: Int
     
     var projectsToShow: [Binding<KnitProject>] {
-         let indices = store.projects.indices
-
-         if let status {
-             return indices
-                 .filter { store.projects[$0].status == status }
-                 .map { $store.projects[$0] }
-         } else {
-             return indices.map { $store.projects[$0] }
-         }
+        let indices = store.projects.indices
+        
+        let filtered: [Int]
+        if let status {
+            filtered = indices.filter {store.projects[$0].status == status}
+            
+        } else {
+            filtered = Array(indices)
+        }
+        
+        let sorted = filtered.sorted{ a, b in
+            if store.projects[a].isFavorite != store.projects[b].isFavorite{
+                return store.projects[a].isFavorite
+            }
+            return false
+        }
+        return sorted.map{$store.projects[$0]}
      }
+    
+    
     
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -97,6 +107,28 @@ struct ProjectCardView: View {
                     .background(statusColor(for: project.status))
                     .cornerRadius(12)
                     .padding(8)
+                
+                
+                // ⭐ 즐겨찾기 버튼 (추가) - topLeading에 배치
+                     VStack {
+                         HStack {
+                             Button {
+                                 store.toggleFavorite(project)
+                             } label: {
+                                 Image(systemName: project.isFavorite ? "star.fill" : "star")
+                                     .font(.title3)
+                                     .foregroundColor(project.isFavorite ? .yellow :
+                 .white.opacity(0.7))
+                                     .shadow(radius: 2)
+                             }
+                             .buttonStyle(.plain)
+                             .padding(12)
+                             Spacer()
+                         }
+                         Spacer()
+                     }
+                 
+
             }
             
             HStack {
