@@ -7,28 +7,24 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct RowCounterView: View {
     @Binding var title: String
     @Binding var count: Int
-    
+
     let canDelete: Bool
     let onChange: () -> Void
     let onDelete: () -> Void
-    
-    
+
     @FocusState private var isEditingTitle: Bool
 
     var body: some View {
-        VStack(spacing: 8) {
-
-            //이름 수정
-            HStack{
+        VStack(spacing: 10) {
+            // 이름 수정 + 삭제
+            HStack {
                 TextField("단수 이름", text: $title)
-                    .font(.headline)
+                    .font(.subheadline.weight(.medium))
                     .multilineTextAlignment(.center)
-                    .textFieldStyle(.roundedBorder)
+                    .textFieldStyle(.plain)
                     .focused($isEditingTitle)
                     .onSubmit {
                         onChange()
@@ -36,27 +32,29 @@ struct RowCounterView: View {
                     .onChange(of: title) { _ in
                         onChange()
                     }
-                
-                Spacer()
-                
+
                 Button {
                     if canDelete {
                         onDelete()
                     }
                 } label: {
                     Image(systemName: "xmark.circle.fill")
+                        .font(.caption)
                         .foregroundColor(
-                            canDelete ? .gray : .gray.opacity(0.3)
+                            canDelete ? Color(.systemGray3) : Color(.systemGray5)
                         )
                 }
                 .disabled(!canDelete)
             }
-            
-            Text("\(count)")
-                .font(.system(size: 32, weight: .bold))
-                .foregroundColor(.accentColor)
 
-            HStack(spacing: 12) {
+            // 카운트 숫자
+            Text("\(count)")
+                .font(.system(size: 36, weight: .bold, design: .rounded))
+                .foregroundColor(.accentColor)
+                .contentTransition(.numericText())
+
+            // +/- 버튼
+            HStack(spacing: 20) {
                 Button {
                     if count > 0 {
                         count -= 1
@@ -64,8 +62,8 @@ struct RowCounterView: View {
                     }
                 } label: {
                     Image(systemName: "minus.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(.red.opacity(0.8))
+                        .font(.title)
+                        .foregroundColor(.red.opacity(0.7))
                 }
 
                 Button {
@@ -73,24 +71,23 @@ struct RowCounterView: View {
                     onChange()
                 } label: {
                     Image(systemName: "plus.circle.fill")
-                        .font(.title2)
+                        .font(.title)
                         .foregroundColor(.green.opacity(0.8))
                 }
             }
         }
-        .frame(width: 120)
+        .frame(width: 140)
         .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(16)
-
-          .overlay(
-              RoundedRectangle(cornerRadius: 16)
-                  .stroke(Color.accentColor, lineWidth: 2)
-          )
-          .onLongPressGesture {
-              count = 0
-              onChange()
-          }
-        .shadow(color: .black.opacity(0.05), radius: 3)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.06), radius: 4, x: 0, y: 2)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.accentColor.opacity(0.15), lineWidth: 1)
+        )
+        .onLongPressGesture {
+            count = 0
+            onChange()
+        }
     }
 }
